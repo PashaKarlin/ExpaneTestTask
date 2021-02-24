@@ -1,18 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import Modal from 'react-modal'
 import Button from './button'
 import '../styles/table.css'
 import Form from './Form'
 import { customStyles } from './reactModalStyles'
+import { useQuery } from 'react-query'
 // import Loader from './Loader'
 
 
 
 const Table: React.FC = () => {
     const [modalIsOpen, setIsOpen] = useState(false)
-    const [data, setData] = useState([])
+    const [trueData, setData] = useState([])
+    const {isLoading,error,data} = useQuery('data', () =>
+        fetch('https://test-task.expane.pro/api/graphql').then(res =>
+         console.log(res.json())))
     const getData = newData => {
-        setData([...data, newData])
+        setData([...trueData, newData])
     }
     const openModal = () => {
         setIsOpen(true);
@@ -20,7 +24,11 @@ const Table: React.FC = () => {
     const closeModal = () => {
         setIsOpen(false)
     }
-    console.log(data)
+     
+    
+
+
+
     return (
         <div className='flex flex-col h-screen my-auto items-center bgimg bg-cover'>
             <Button name={'Add Client'} onClick={openModal} />
@@ -42,7 +50,7 @@ const Table: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map(item => {
+                    {trueData.map(item => {
                         return (
                             <tr>
                                 <td>{item.firstName}</td>
