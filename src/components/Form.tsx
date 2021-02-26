@@ -1,21 +1,23 @@
 import React from 'react'
+import gql from 'graphql-tag'
+import {GraphQLClient} from "graphql-request"
+import request from 'graphql-request';
 import { useForm } from "react-hook-form";
 import '../styles/form.css'
-
+import { useQuery } from 'react-query';
 
 type Inputs = {
     example: string,
     exampleRequired: string,
 };
 
-const Form: React.FC = ({closeModal,addClient}) => {
+const Form: React.FC = ({closeModal,addClient,test}) => {
     const { register, handleSubmit } = useForm<Inputs>();
-
+    
     const onSubmit = data => {
         addClient(data)
         closeModal()
     }
-    // console.log(watch("firstName"))
     return (
         <>
             <h1>Add Client</h1>
