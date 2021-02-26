@@ -5,3 +5,21 @@ td{
     border: 1px black solid;
     text-align: center;
 }
+.loading_style{
+    text-align: center;
+}
+.avatar{
+    width:100px;
+    height: auto;
+    
+}
+.item{
+    background-color: rgb(209, 118, 209);
+    border-radius: 10px;
+}
+.img_block{
+    padding: 10px;
+}
+.inline-block{
+    margin: 5px 5px;
+}

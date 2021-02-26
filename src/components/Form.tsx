@@ -8,11 +8,11 @@ type Inputs = {
     exampleRequired: string,
 };
 
-const Form: React.FC = ({closeModal,getData}) => {
+const Form: React.FC = ({closeModal,addClient}) => {
     const { register, handleSubmit } = useForm<Inputs>();
 
     const onSubmit = data => {
-        getData(data)
+        addClient(data)
         closeModal()
     }
     // console.log(watch("firstName"))
@@ -36,7 +36,10 @@ const Form: React.FC = ({closeModal,getData}) => {
                     <label>Avatar : </label>
                     <input className='form_input' name="avatarUrl" ref={register({ required: true })} />
                 </div>
-                <input type="submit" />
+                <div className = 'form_item'>
+                    <input className='form_input' type='hidden' value = {Date.now()} name="id" ref={register({ required: true })} />
+                </div>
+                <input type="submit" value = 'Submit' />
             </form>
         </>
 

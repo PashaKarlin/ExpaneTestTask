@@ -1,36 +1,81 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Modal from 'react-modal'
+import gql from 'graphql-tag'
+// import { request } from 'graphql-request'
+// import {useQuery} from 'react-query'
 import Button from './button'
 import '../styles/table.css'
 import Form from './Form'
 import { customStyles } from './reactModalStyles'
-import { useQuery } from 'react-query'
+import { useGQLQuery } from './useGQLQuery'
 // import Loader from './Loader'
 
+const GET_CLIENTS = gql`
+    query{
+        getClients{
+            firstName,
+            lastName,
+            id,
+            phone,
+            avatarUrl
+        }
+    }
+`
+const ADD_CLIENT= (data) => gql`
+mutation{
+    addClient(
+        firstName:"${data.firstName}",
+        lastName:"${data.lastName}",
+        phone:"${data.phone}",
+        avatarUrl:"${data.avatarUrl}"
+        ){
+        firstName
+        lastName
+        phone
+        avatarUrl
+    }
+}
+`
 
 
 const Table: React.FC = () => {
     const [modalIsOpen, setIsOpen] = useState(false)
-    const [trueData, setData] = useState([])
-    const {isLoading,error,data} = useQuery('data', () =>
-        fetch('https://test-task.expane.pro/api/graphql').then(res =>
-         console.log(res.json())))
-    const getData = newData => {
-        setData([...trueData, newData])
+    const [clients, setClients] = useState([])
+    const { data, isLoading, error } = useGQLQuery('getClients', GET_CLIENTS)
+
+    const fetchClientsData = () => {
+        setClients([...clients.concat(data.getClients)])
+    }
+
+    // useEffect(() => {
+    //     request('https://test-task.expane.pro/api/graphql',GET_CLIENTS)
+    //     .then((data => setClients([...clients.concat(data.getClients)])))
+    //     },[])
+
+    // useEffect(() => {
+    //     fetchClientsData
+    // })
+
+
+    const addClient = newClient => {
+        setClients([...clients, newClient])
     }
     const openModal = () => {
         setIsOpen(true);
+        console.log(clients)
     }
     const closeModal = () => {
         setIsOpen(false)
     }
-     
-    
+    if (isLoading) return <h1 className='loading_style p-auto'>Loading ... </h1>
+    if (error) return alert(error)
 
 
 
     return (
         <div className='flex flex-col h-screen my-auto items-center bgimg bg-cover'>
+            <Button onClick={fetchClientsData} name='fetch data' />
+            {/* <Button onClick={logData} name='log data' /> */}
             <Button name={'Add Client'} onClick={openModal} />
             <Modal
                 isOpen={modalIsOpen}
@@ -38,31 +83,31 @@ const Table: React.FC = () => {
                 onRequestClose={closeModal}
                 ariaHideApp={false}
             >
-                <Form closeModal={closeModal} getData={getData} />
+                <Form closeModal={closeModal} addClient={addClient} />
             </Modal>
-            <table className='table-auto'>
-                <thead>
-                    <tr>
-                        <th className=' '>First Name</th>
-                        <th className=' '>Last Name</th>
-                        <th className=' '>Phone</th>
-                        <th className=' '>AvatarUrl</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {trueData.map(item => {
-                        return (
-                            <tr>
-                                <td>{item.firstName}</td>
-                                <td>{item.lastName}</td>
-                                <td>{item.phone}</td>
-                                <td>{item.avatarUrl}</td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
+            <div>
+                {clients.map(item => {
+                    return (
+                        <div className='space-x-2 item m-1 flex'>
+                            <div className="inline-block img_block">
+                                <img src={item.avatarUrl} className='avatar' alt="/" />
+                            </div>
+                            <div className="space-y-2 inline-block m-auto">
+                                <div className="block m-auto">
+                                    <h4>Name :{item.firstName}</h4>
+                                </div>
+                                <div className="block m-auto">
+                                    <h4>Last Name :{item.lastName}</h4>
+                                </div>
+                                <div className="block m-auto">
+                                    <h4>Phone :{item.phone}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
 
-            </table>
         </div>
     )
 }
