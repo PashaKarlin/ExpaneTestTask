@@ -4,7 +4,7 @@ import Table from './components/Table';
 
 const App: React.FC = () => {
   return (
-    <div className="">
+    <div className="app_block">
       <Table />
       
     </div>

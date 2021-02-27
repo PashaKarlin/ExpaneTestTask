@@ -1,19 +1,15 @@
 import React from 'react'
-import gql from 'graphql-tag'
-import {GraphQLClient} from "graphql-request"
-import request from 'graphql-request';
 import { useForm } from "react-hook-form";
 import '../styles/form.css'
-import { useQuery } from 'react-query';
 
 type Inputs = {
     example: string,
     exampleRequired: string,
 };
 
-const Form: React.FC = ({closeModal,addClient,test}) => {
+const Form: React.FC = ({ closeModal, addClient, test }) => {
     const { register, handleSubmit } = useForm<Inputs>();
-    
+
     const onSubmit = data => {
         addClient(data)
         closeModal()
@@ -22,23 +18,47 @@ const Form: React.FC = ({closeModal,addClient,test}) => {
         <>
             <h1>Add Client</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div className = 'form_item'>
+                <div className='form_item'>
                     <label>First Name : </label>
-                    <input className='form_input' name="firstName" ref={register({ required: true })} />
+                    <input
+                        className='form_input'
+                        name="firstName"
+                        ref={register({
+                            required: true,
+                            pattern: /^[A-Za-zА-Яа-я\-]+$/i
+                        })} />
                 </div>
-                <div className = 'form_item'>
+                <div className='form_item'>
                     <label>Last Name : </label>
-                    <input className='form_input' name="lastName" ref={register({ required: true })} />
+                    <input
+                        className='form_input'
+                        name="lastName"
+                        ref={register({
+                            required: true,
+                            pattern: /^[A-Za-zА-Яа-я\-]+$/i
+                        })} />
                 </div>
-                <div className = 'form_item'> 
+                <div className='form_item'>
                     <label>Phone : </label>
-                    <input className='form_input' name="phone" ref={register({ required: true })} />
+                    <input
+                        className='form_input'
+                        name="phone"
+                        ref={register({
+                            required: true,
+                            pattern: /^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){10,14}(\s*)?$/
+                        })} />
                 </div>
-                <div className = 'form_item'>
+                <div className='form_item'>
                     <label>Avatar : </label>
-                    <input className='form_input' name="avatarUrl" ref={register({ required: true })} />
+                    <input
+                        className='form_input'
+                        name="avatarUrl"
+                        ref={register({
+                            required: true,
+                            pattern: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/g
+                        })} />
                 </div>
-                <input type="submit" value = 'Submit' />
+                <input type="submit" value='Submit' />
             </form>
         </>
 

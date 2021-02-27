@@ -1,16 +1,15 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { request } from 'graphql-request'
 import Modal from 'react-modal'
 import { customStyles } from './reactModalStyles'
-import { request } from 'graphql-request'
 
 
-
-const UpdateForm: React.FC = ({ id, getClients, setClients }) => {
+const UpdateForm: React.FC = ({ item, getClients, setClients }) => {
     const [modalIsOpen, setIsOpen] = useState(false)
-    const [ID,setID] = useState()
+    const [ID, setID] = useState()
     const { register, handleSubmit } = useForm()
-    const onSubmit = ( data) => {
+    const onSubmit = (data) => {
         fetch('https://test-task.expane.pro/api/graphql', {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -30,9 +29,6 @@ const UpdateForm: React.FC = ({ id, getClients, setClients }) => {
                     avatarUrl
                 }
             }`})
-
-
-
         })
             .then(() => {
                 request('https://test-task.expane.pro/api/graphql', getClients).then(res => setClients(res.getClients))
@@ -49,9 +45,9 @@ const UpdateForm: React.FC = ({ id, getClients, setClients }) => {
     return (
         <>
             <button
-                value = {id}
+                value={item.id}
                 onClick={openModal}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded button_update">
                 Update Client
             </button>
             <Modal isOpen={modalIsOpen}
@@ -62,21 +58,41 @@ const UpdateForm: React.FC = ({ id, getClients, setClients }) => {
                     <h1>Update Client</h1>
                     <div className='form_item'>
                         <label>First Name : </label>
-                        <input className='form_input' name="firstName" ref={register({ required: true })} />
+                        <input
+                            className='form_input'
+                            name="firstName" defaultValue={item.firstName}
+                            ref={register({ required: true, pattern: /^[A-Za-zА-Яа-я\-]+$/i})}
+                        />
                     </div>
                     <div className='form_item'>
                         <label>Last Name : </label>
-                        <input className='form_input' name="lastName" ref={register({ required: true })} />
+                        <input
+                            className='form_input'
+                            name="lastName"
+                            defaultValue={item.lastName}
+                            ref={register({ required: true , pattern:/^[A-Za-zА-Яа-я\-]+$/i})}
+                        />
                     </div>
                     <div className='form_item'>
                         <label>Phone : </label>
-                        <input className='form_input' name="phone" ref={register({ required: true })} />
+                        <input
+                            className='form_input'
+                            name="phone"
+                            defaultValue={item.phone}
+                            ref={register({ required: true, pattern : /^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){10,14}(\s*)?$/ })}
+                        />
                     </div>
                     <div className='form_item'>
                         <label>Avatar : </label>
-                        <input className='form_input' name="avatarUrl" ref={register({ required: true })} />
+                        <input
+                            className='form_input'
+                            name="avatarUrl"
+                            defaultValue={item.avatarUrl}
+                            ref={register({ required: true ,
+                                pattern : /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/g})}
+                        />
                     </div>
-                    <input type="submit" value='Submit'/>
+                    <input type="submit" value='Submit' />
                 </form>
             </Modal>
         </>

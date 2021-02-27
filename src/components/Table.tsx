@@ -8,8 +8,8 @@ import '../styles/table.css'
 import Form from './Form'
 import { customStyles } from './reactModalStyles'
 import UpdateForm from './UpdateForm'
+import Loader from './Loader'
 
-// import Loader from './Loader'
 
 const GET_CLIENTS = gql`
     query{
@@ -28,23 +28,26 @@ const GET_CLIENTS = gql`
 const Table: React.FC = () => {
     const [modalIsOpen, setIsOpen] = useState(false)
     const [clients, setClients] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+    useEffect(async () => {
+        try {
+            await request('https://test-task.expane.pro/api/graphql', GET_CLIENTS)
+                .then(res => setClients(res.getClients))
+        } catch (error) {
+            alert('Something wrong, open console for details')
+            console.log(error)
+        }
 
-    // const  { data, isLoading, error } = useGQLQuery('getClients', GET_CLIENTS)
-
-    // const fetchClientsData = () => {
-    //     setClients([...clients.concat(data.getClients)])
-    // }
-    useEffect(() => {
-            request('https://test-task.expane.pro/api/graphql', GET_CLIENTS)
-            .then(res => setClients(res.getClients))
     }, [])
 
-    const addClient = data => {
-        fetch('https://test-task.expane.pro/api/graphql', {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                query: `
+    const addClient = async data => {
+        try {
+            setIsLoading(true)
+            await fetch('https://test-task.expane.pro/api/graphql', {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: `
             mutation{
                 addClient(
                     firstName:"${data.firstName}",
@@ -59,12 +62,14 @@ const Table: React.FC = () => {
                 }
             }`})
 
-        })
-            .then(response => response.json())
-            .then(() => {
-                request('https://test-task.expane.pro/api/graphql', GET_CLIENTS).then(res => setClients(res.getClients))
             })
-
+        } catch (error) {
+            alert('Something wrong, open console for details')
+            console.log(error)
+        } finally {
+            request('https://test-task.expane.pro/api/graphql', GET_CLIENTS).then(res => setClients(res.getClients))
+            setIsLoading(false)
+        }
     }
     const openModal = () => {
         setIsOpen(true);
@@ -72,37 +77,41 @@ const Table: React.FC = () => {
     const closeModal = () => {
         setIsOpen(false)
     }
+    if (isLoading) return <Loader />
 
     return (
-        <div className='flex flex-col h-screen my-auto items-center bgimg bg-cover'>
-            <Button name={'Add Client'} onClick={openModal} />
+        <div className='flex flex-col my-auto items-center bgimg bg-cover table_background'>
+            <header className = 'w-full sticky top-0 text-center addclient_block'>
+                <Button name={'Add Client'} onClick={openModal} />
+            </header>
+
             <Modal
                 isOpen={modalIsOpen}
                 style={customStyles}
                 onRequestClose={closeModal}
                 ariaHideApp={false}
             >
-                <Form closeModal={closeModal} addClient = {addClient}/>
+                <Form closeModal={closeModal} addClient={addClient} />
             </Modal>
             <div>
                 {clients.map(item => {
                     return (
                         <div className='space-x-2 m-1 flex item'>
                             <div className="inline-block img_block">
-                                <img src={item.avatarUrl} className='avatar' alt="/" />
+                                <img src={item.avatarUrl} className='avatar' alt="Client avatar" />
                             </div>
-                            <div className="space-y-2 inline-block m-auto">
-                                <div className="block m-auto">
-                                    <h4>Name :{item.firstName}</h4>
+                            <div className='information_block'>
+                                <div className="">
+                                    <h4>Name : {item.firstName}</h4>
                                 </div>
-                                <div className="block m-auto">
-                                    <h4>Last Name :{item.lastName}</h4>
+                                <div className="">
+                                    <h4>Last Name : {item.lastName}</h4>
                                 </div>
-                                <div className="block m-auto">
-                                    <h4>Phone :{item.phone}</h4>
+                                <div className="">
+                                    <h4>Phone : {item.phone}</h4>
                                 </div>
                             </div>
-                            <UpdateForm id = {item.id} getClients = {GET_CLIENTS} setClients = {setClients}/>
+                            <UpdateForm item={item} getClients={GET_CLIENTS} setClients={setClients} />
                         </div>
                     )
                 })}
