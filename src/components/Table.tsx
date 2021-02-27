@@ -9,8 +9,6 @@ import Form from './Form'
 import { customStyles } from './reactModalStyles'
 import UpdateForm from './UpdateForm'
 
-
-// import UpdateForm from './updateForm'
 // import Loader from './Loader'
 
 const GET_CLIENTS = gql`
@@ -84,7 +82,7 @@ const Table: React.FC = () => {
                 onRequestClose={closeModal}
                 ariaHideApp={false}
             >
-                <Form closeModal={closeModal} addClient={addClient} />
+                <Form closeModal={closeModal} addClient = {addClient}/>
             </Modal>
             <div>
                 {clients.map(item => {
